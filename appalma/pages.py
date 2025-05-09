@@ -1,4 +1,4 @@
-
+import streamlit as st
 
 
 class Login():
@@ -7,7 +7,7 @@ class Login():
     """
 
     def __init__(self, server="alma.icr.ac.uk", username=None, password=None, sftp="alma-app.icr.ac.uk", port=22):
-        pass
+        st.write("Logging in!!!")
 
     def tst():
         pass
