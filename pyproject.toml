@@ -13,7 +13,7 @@ dependencies = [
     "paramiko>=3.5.0",    
     "pyyaml",
     "streamlit",
-    
+
 ]
 
 [project.optional-dependencies]
@@ -27,10 +27,7 @@ test = [
 where = ["."]
 
 [tool.setuptools.package-data]
-pyalma = ["*.py", "config/*.yaml"]
-
-[project.scripts]
-pyalma-cli = 'pyalma.cli:main'
+appalma = ["*.py", "config/*.yaml"]
 
 [tool.setuptools_scm]
 version_scheme = "post-release"
