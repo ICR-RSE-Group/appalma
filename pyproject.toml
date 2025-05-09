@@ -12,7 +12,8 @@ dependencies = [
     "pandas==2.2.3",
     "paramiko>=3.5.0",    
     "pyyaml",
-    "streamlit"
+    "streamlit",
+    
 ]
 
 [project.optional-dependencies]
