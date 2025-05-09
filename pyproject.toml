@@ -27,8 +27,5 @@ test = [
 where = ["."]
 
 [tool.setuptools.package-data]
-appalma = ["*.py", "config/*.yaml"]
+appalma = ["*.py"]
 
-[tool.setuptools_scm]
-version_scheme = "post-release"
-local_scheme = "node-and-date"

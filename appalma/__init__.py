@@ -1,4 +1,4 @@
-# pyalma/__init__.py
+# appalma/__init__.py
 from .pages import Login
 
 try:
