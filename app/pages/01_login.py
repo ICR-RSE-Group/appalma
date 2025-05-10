@@ -1,6 +1,6 @@
 
 from appalma.maker import PageStore
-from appalma.pages import Login
+from appalma.login import Login
 
 
 PageStore().add_to_page("cfg")

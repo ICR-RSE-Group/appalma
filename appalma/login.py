@@ -1,6 +1,7 @@
 import streamlit as st
 from .cmd import CmdSSH
-
+from .maker import PageStore
+from pyalma import SshClient
 
 
 class Login():
@@ -14,9 +15,9 @@ class Login():
         self.password = password
         self.sftp = sftp
         self.port = port
+        self.ssh = None
         self.cmd = None        
-        
-                    
+                                    
     def play(self):
         cols = st.columns([5,1])
         with cols[0]:
@@ -32,9 +33,14 @@ class Login():
                 with cols2[0]:
                     self.server = st.text_input("Remote server:", self.server)
                 with cols2[1]:
-                    self.sftp = st.text_input("SFTP server:", self.sftp)        
-        self.cmd = CmdSSH(self.server, self.sftp, self.username, self.password, self.port)
-        self.cmd.play()
+                    self.sftp = st.text_input("SFTP server:", self.sftp)                
+        if st.button("Connect"):            
+            self.ssh = SshClient(server=self.server, username=self.username, password=self.password, port=self.port)                  
+            if self.ssh is not None:            
+                PageStore().set_global("ssh", self.ssh)
+            self.cmd = CmdSSH(self.ssh)
+            self.cmd.play()
+
         
 
     

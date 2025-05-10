@@ -5,7 +5,6 @@ from contextlib import contextmanager, redirect_stdout
 import os
 import time
 import subprocess
-from pyalma import SshClient
 
 
 # Helper function that streams stdout to a streamlit component
@@ -27,49 +26,51 @@ def st_capture(output_func):
 
 
 
+class CmdSSHLite():
+    """
+    lite ssh for minimal widgets
+    """
+
+    def __init__(self, ssh,cmd="ls -a"):        
+        self.ssh = ssh
+        self.cmd = cmd
+                                        
+    def play(self):                
+        with st.spinner("", show_time=True):                                            
+            results = self.ssh.run_cmd(self.cmd)
+            results_str, error_str = results["output"], results["err"]
+            return results_str, error_str
+                
 class CmdSSH():
     """
     Login for local system.os
     """
 
-    def __init__(self, server,sftp,username,password,port,cmd="ls -a"):
+    def __init__(self,ssh,cmd="ls -a"):        
+        self.ssh = ssh
         self.cmd = cmd
-        self.server = server
-        self.username = username
-        self.password = password
-        self.sftp = sftp
-        self.ssh = None
-        self.port = port
                                 
     def play(self):
         cols = st.columns([2,2,7])
         with cols[2]:
             with st.expander("Command output", expanded=False):                        
                 output = st.empty()
-        with cols[0]:
-            if st.button("Press me"):            
-                with st.spinner("", show_time=True):                    
-                    with st_capture(output.code):                                          
-                        try:
-                            self.ssh = SshClient(server=self.server, username=self.username, password=self.password, port=self.port)                  
-                        except Exception as e:
-                            with cols[1]:
-                                st.error("Error")
-                                print("Error connecting to server", e)
-                                return
-                        print("Starting command", self.cmd)                        
-                        start = time.time()
-                        results_str, error_str = self.cmd_ssh(self.cmd)
-                        end = time.time()            
-                        print(f"Elapsed time {round(end - start, 3)} seconds")      
-                        OK = error_str == None
-                        print(results_str)
-                        print(error_str)
-                        with cols[1]:
-                            if OK:                                                                                                
-                                st.success("OK")
-                            else:                                
-                                st.error("FAILED")                          
+        with cols[0]:            
+            with st.spinner("", show_time=True):                    
+                with st_capture(output.code):                                                                  
+                    print("Starting command", self.cmd)                        
+                    start = time.time()
+                    results_str, error_str = self.cmd_ssh(self.cmd)
+                    end = time.time()            
+                    print(f"Elapsed time {round(end - start, 3)} seconds")      
+                    OK = error_str == None
+                    print(results_str)
+                    print(error_str)
+                    with cols[1]:
+                        if OK:                                                                                                
+                            st.success("OK")
+                        else:                                
+                            st.error("FAILED")                          
 
     
     def cmd_ssh(self,params):
@@ -93,7 +94,7 @@ class CmdLocal():
             with st.expander("Command output", expanded=False):                        
                 output = st.empty()
         with cols[0]:        
-            if st.button("Press me"):
+            if st.button("Execute"):
                 with st.spinner("", show_time=True):                    
                     with st_capture(output.code):                                    
                         print("Starting command", self.cmd)                        

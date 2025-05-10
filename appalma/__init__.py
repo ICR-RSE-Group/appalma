@@ -1,9 +1,10 @@
 # appalma/__init__.py
 from .maker import PageStore
 from .visuals import PageConfig
-from .pages import Login
+from .login import Login
 from .cmd import CmdLocal
 from .cmd import CmdSSH
+from .cmd import CmdSSHLite
 
 
 try:
