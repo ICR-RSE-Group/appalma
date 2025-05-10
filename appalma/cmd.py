@@ -50,27 +50,22 @@ class CmdSSH():
         self.ssh = ssh
         self.cmd = cmd
                                 
-    def play(self):
-        cols = st.columns([2,2,7])
-        with cols[2]:
-            with st.expander("Command output", expanded=False):                        
-                output = st.empty()
-        with cols[0]:            
-            with st.spinner("", show_time=True):                    
-                with st_capture(output.code):                                                                  
-                    print("Starting command", self.cmd)                        
-                    start = time.time()
-                    results_str, error_str = self.cmd_ssh(self.cmd)
-                    end = time.time()            
-                    print(f"Elapsed time {round(end - start, 3)} seconds")      
-                    OK = error_str == None
-                    print(results_str)
-                    print(error_str)
-                    with cols[1]:
-                        if OK:                                                                                                
-                            st.success("OK")
-                        else:                                
-                            st.error("FAILED")                          
+    def play(self):        
+        output = st.empty()
+        with st.spinner("", show_time=True):                    
+            with st_capture(output.code):                                                                  
+                print("Starting command", self.cmd)                        
+                start = time.time()
+                results_str, error_str = self.cmd_ssh(self.cmd)
+                end = time.time()            
+                print(f"Elapsed time {round(end - start, 3)} seconds")      
+                OK = error_str == None
+                print(results_str)
+                print(error_str)                
+                if OK:                                                                                                
+                    st.success("OK")
+                else:                                
+                    st.error("FAILED")                          
 
     
     def cmd_ssh(self,params):
