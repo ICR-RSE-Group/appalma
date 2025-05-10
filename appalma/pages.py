@@ -1,4 +1,6 @@
 import streamlit as st
+from .cmd import CmdSSH
+
 
 
 class Login():
@@ -7,21 +9,32 @@ class Login():
     """
 
     def __init__(self, server="alma.icr.ac.uk", username=None, password=None, sftp="alma-app.icr.ac.uk", port=22):
-        cols = st.columns([5,2])
+        self.server = server
+        self.username = username
+        self.password = password
+        self.sftp = sftp
+        self.port = port
+        self.cmd = None        
+        
+                    
+    def play(self):
+        cols = st.columns([5,1])
         with cols[0]:
             tabUser, tabServer = st.tabs(["User", "(Server)"])
             with tabUser:
                 cols1 = st.columns([2,2])    
                 with cols1[0]:        
-                    username = st.text_input("Username:", username, key="username")
+                    self.username = st.text_input("Username:", self.username, key="username")
                 with cols1[1]:
-                    password = st.text_input("Password:", "", type="password", key="password")
+                    self.password = st.text_input("Password:", self.password, type="password", key="password")
             with tabServer:
                 cols2 = st.columns([2,2])    
                 with cols2[0]:
-                    server = st.text_input("Remote server:", "alma.icr.ac.uk")
+                    self.server = st.text_input("Remote server:", self.server)
                 with cols2[1]:
-                    sftp = st.text_input("SFTP server:", "alma-app.icr.ac.uk")
+                    self.sftp = st.text_input("SFTP server:", self.sftp)        
+        self.cmd = CmdSSH(self.server, self.sftp, self.username, self.password, self.port)
+        self.cmd.play()
+        
 
-    def tst():
-        pass
+    
