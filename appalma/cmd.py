@@ -23,57 +23,78 @@ def st_capture(output_func):
             yield
     except Exception as e:
         st.error(str(e))
-
-
-
-class CmdSSHLite():
-    """
-    lite ssh for minimal widgets
-    """
-
-    def __init__(self, ssh,cmd="ls -a"):        
-        self.ssh = ssh
-        self.cmd = cmd
-                                        
-    def play(self):                
-        with st.spinner("", show_time=True):                                            
-            results = self.ssh.run_cmd(self.cmd)
-            results_str, error_str = results["output"], results["err"]
-            return results_str, error_str
                 
 class CmdSSH():
     """
     Login for local system.os
     """
 
-    def __init__(self,ssh,cmd="ls -a"):        
+    def __init__(self,ssh,button="",spinner="",cmd_edit=False,output="print",cmd="ls -a"):        
         self.ssh = ssh
+        self.button=button
+        self.spinner=spinner
+        self.cmd_edit = cmd_edit
         self.cmd = cmd
+        self.output = output
+        self.selected_line = ""        
+        self.error = ""
+        self.result = ""
+        self.ok = False
+        
                                 
     def play(self):        
-        output = st.empty()
-        with st.spinner("", show_time=True):                    
-            with st_capture(output.code):                                                                  
-                print("Starting command", self.cmd)                        
-                start = time.time()
-                results_str, error_str = self.cmd_ssh(self.cmd)
-                end = time.time()            
-                print(f"Elapsed time {round(end - start, 3)} seconds")      
-                OK = error_str == None
-                print(results_str)
-                print(error_str)                
-                if OK:                                                                                                
-                    st.success("OK")
-                else:                                
-                    st.error("FAILED")                          
-
-    
-    def cmd_ssh(self,params):
-        print("---  ")
-        results = self.ssh.run_cmd(self.cmd)
-        results_str, error_str = results["output"], results["err"]                                                 
-        return results_str, error_str
+        if self.cmd_edit:
+            self.cmd = st.text_area("Command:", self.cmd, height=100, key="cmd")
+        else:
+            st.write(self.cmd)
         
+        if self.button == "":            
+            self.play_inner()
+        else:            
+            if st.button(self.button):
+                self.play_inner()
+    
+    def play_inner(self):        
+        """
+        ouput = ["print", "df", "text", "code", "radio", "list"]
+        """        
+        with st.spinner(self.spinner, show_time=True):                                
+            print("Starting command", self.cmd)                        
+            start = time.time()
+            results = self.ssh.run_cmd(self.cmd)
+            results_str, error_str = results["output"], results["err"]                                               
+            end = time.time()            
+            print(f"Elapsed time {round(end - start, 3)} seconds")      
+            OK = error_str == None                
+            self.result = results_str
+            self.error = error_str
+            self.ok = OK
+            if not OK:                                                                                                                
+                st.error(f"FAILED: {error_str}")
+            else:                
+                if self.output == "print":
+                    print(results_str)                
+                elif self.output == "df":
+                    try:
+                        df = pd.read_csv(StringIO(results_str))
+                        st.dataframe(df)
+                    except Exception as e:
+                        st.error(f"Error parsing output: {e}")
+                elif self.output == "text":
+                    st.text(results_str)
+                elif self.output == "code":
+                    st.code(results_str)
+                elif self.output == "radio":
+                    lines = results_str.split("\n")
+                    if len(lines) > 0:
+                        self.selected_line = st.radio("Select a line:", lines)
+                        st.text(self.selected_line)
+                elif self.output == "list":
+                    lines = results_str.split("\n")
+                    if len(lines) > 0:
+                        self.result = lines
+                
+                                    
 ############################################################################        
 class CmdLocal():
     """
@@ -82,7 +103,7 @@ class CmdLocal():
 
     def __init__(self, cmd=["ls", "-a"]):
         self.cmd = cmd
-                                
+                                        
     def play(self):
         cols = st.columns([2,2,7])
         with cols[2]:

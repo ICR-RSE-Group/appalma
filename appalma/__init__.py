@@ -1,10 +1,10 @@
 # appalma/__init__.py
 from .maker import PageStore
 from .visuals import PageConfig
-from .login import Login
+from .login import SlurmLogin
 from .cmd import CmdLocal
 from .cmd import CmdSSH
-from .cmd import CmdSSHLite
+from .browse import BrowseView
 
 
 try:
