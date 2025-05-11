@@ -5,6 +5,7 @@ from .login import SlurmLogin
 from .cmd import CmdLocal
 from .cmd import CmdSSH
 from .browse import BrowseView
+from .settings import Settings
 
 
 try:

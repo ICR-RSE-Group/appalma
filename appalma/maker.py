@@ -7,6 +7,10 @@ class PageStore(object):
             cls.instance = super(PageStore, cls).__new__(cls)
         return cls.instance
   
+    def ssh_success(self):
+        ssh = self.get_global("ssh")
+        return ssh
+
     def add_to_page(self, key, page=None):        
         if not hasattr(self, 'pages'):
             self.pages = {}

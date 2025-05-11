@@ -21,8 +21,9 @@ class SlurmLogin():
 
         self.removes = "hpcuser"
         self.scratch = "/data/scratch"
-        self.known_groups = {"infotech": "/data/scratch/.DCO",
-                             "dbccag":""}
+        self.known_groups = {"infotech": "/data/scratch/DCO/DIGOPS/SCIENCOM/",
+                             "dbcdobcag":"/data/scratch/DBC/UBCN/BCRBIOIN/",
+                             "dgershadg":"/data/scratch/DGE/DUDGE/MOPOPGEN/",}
         
         self.my_scratch = ""
         self.my_home = ""

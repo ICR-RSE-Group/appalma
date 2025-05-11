@@ -1,22 +1,21 @@
 import streamlit as st
+from appalma.visuals import PageConfig
 from appalma.maker import PageStore
-from appalma.cmd import CmdSSH
+from appalma.settings import Settings
 
 
-PageStore().add_to_page("cfg")
-ssh = PageStore().get_global("ssh")
-tabRadio, tabList,tabCode,tabDf,tabText,tabButton = st.tabs(["tabRadio", "tabList","tabCode","tabDf","tabText", "tabButton"])
-with tabRadio:    
-    PageStore().add_to_page("browse1", CmdSSH(ssh,output="radio"))
-with tabList:    
-    PageStore().add_to_page("browse2", CmdSSH(ssh,output="list"))
-with tabCode:
-    PageStore().add_to_page("browse3", CmdSSH(ssh,output="code"))
-with tabDf:
-    PageStore().add_to_page("browse4", CmdSSH(ssh,output="df"))
-with tabText:
-    PageStore().add_to_page("browse5", CmdSSH(ssh,output="text"))
-with tabButton:
-    PageStore().add_to_page("browse6", CmdSSH(ssh,btton="Click me",output="text"))
+PageStore().add_to_page("cfg", PageConfig())
+ssh = PageStore().ssh_success()
+if ssh:    
+    scratch = PageStore().get_global("my_scratch")
+    home = PageStore().get_global("my_home")
+    sts = Settings(
+        {
+        "inputs":[("working",scratch),("home",home)],
+        "outputs":[("results",scratch),("home",home)]
+        })    
+    PageStore().add_to_page("settings", sts)    
+else:
+    st.error("SSH Connection has not been made, please log on")
 
 

@@ -5,7 +5,7 @@ class PageConfig():
     Header and title/icon for the app
     """
 
-    def __init__(self, page_icon="💥", page_title="demo-appalma",
+    def __init__(self, page_icon="💥", page_title="appalma",
                  header_title="DEMO-APP-ALMA", header_colour="Crimson", 
                  header_html="", sticky=True):
         self.page_icon = page_icon
