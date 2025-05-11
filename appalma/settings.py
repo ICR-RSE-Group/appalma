@@ -12,19 +12,22 @@ class Settings():
         self.settings_dic = settings_dic
         """
         {
-        "inputs":[("working",scratch),("home",home)],
-        "outputs":[("results",scratch),("home",home)]
+        "inputs":{"working":scratch,"home":home},
+        "outputs":{"results":scratch,"home":home}
         },
         """
                                                     
     def play(self):
-        for group_name, tuples in self.settings_dic.items():
-            st.write(group_name)
-            for tpl in tuples:
-                st.write(tpl)
-            
-            
-                                
+        for group_name, file_names in self.settings_dic.items():
+            st.write(f"Settings group: **{group_name}**")
+            for nm, fl in file_names.items():                
+                setting_val = st.text_input(nm, fl, key=group_name+"_" + nm)
+                PageStore().set_global(group_name+"_" + nm, setting_val)
+                st.write(group_name+"_" + nm, setting_val)
+                self.settings_dic[group_name][nm] = setting_val
+            st.write("---  ")
+                
+                                                                
             def change_sel_group():
                 pass
                 #self.my_group = st.session_state.group                

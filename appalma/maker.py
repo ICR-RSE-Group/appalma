@@ -14,7 +14,10 @@ class PageStore(object):
     def add_to_page(self, key, page=None):        
         if not hasattr(self, 'pages'):
             self.pages = {}
-        if key in self.pages and self.pages[key] is not None:
+        #if key in self.pages and page is not None:
+        #    self.pages[key] = page
+        #    self.pages[key].play()
+        if key in self.pages and self.pages[key] is not None:            
             self.pages[key].play()
         else:             
             self.pages[key] = page

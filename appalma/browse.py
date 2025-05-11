@@ -1,7 +1,9 @@
 import streamlit as st
-from .cmd import CmdSSH
 import pandas as pd
 from io import StringIO
+from .cmd import CmdSSH
+from .maker import PageStore
+
 
 
 
@@ -10,21 +12,25 @@ class BrowseView():
     Login for ssh based login
     """
 
-    def __init__(self, ssh, filematch, folder, displays=["text"]):
+    def __init__(self, ssh, filematch, folder_key, displays=["text"], edittable=False):        
         self.ssh = ssh
         self.filematch = filematch
-        self.folder = folder        
+        self.folder_key = folder_key
+        self.folder = "" 
         self.txt_dir = f"find {self.folder} -type f -maxdepth 1 -name '{self.filematch}'"
         self.cmd_dir = None
         self.cmd_file = None
+        self.edittable = edittable
         self.txt_contents = ""        
         self.displays = displays # this can be a list of displays which are shown on tabs text, code, info, df, plot (plot not implemented yet!)
         self.files_list = []
                                             
-    def play(self):
-        cols = st.columns([2,5])
-        with cols[1]:
-            st.write(f"folder={self.folder} filematch={self.filematch}")            
+    def play(self):        
+        self.folder = PageStore().get_global(self.folder_key)
+        self.txt_dir = f"find {self.folder} -type f -maxdepth 1 -name '{self.filematch}'"        
+        if self.edittable:
+            self.txt_dir = st.text_input("Search",self.txt_dir)
+        cols = st.columns([2,5])                    
         with cols[0]:
             if st.button("List files"):            
                 self.cmd_dir = CmdSSH(self.ssh, cmd=self.txt_dir, output="list", spinner="Retrieving files")

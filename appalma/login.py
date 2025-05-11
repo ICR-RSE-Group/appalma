@@ -21,9 +21,9 @@ class SlurmLogin():
 
         self.removes = "hpcuser"
         self.scratch = "/data/scratch"
-        self.known_groups = {"infotech": "/data/scratch/DCO/DIGOPS/SCIENCOM/",
-                             "dbcdobcag":"/data/scratch/DBC/UBCN/BCRBIOIN/",
-                             "dgershadg":"/data/scratch/DGE/DUDGE/MOPOPGEN/",}
+        self.known_groups = {"infotech": "/data/scratch/DCO/DIGOPS/SCIENCOM",
+                             "dbcdobcag":"/data/scratch/DBC/UBCN/BCRBIOIN",
+                             "dgershadg":"/data/scratch/DGE/DUDGE/MOPOPGEN",}
         
         self.my_scratch = ""
         self.my_home = ""
@@ -58,7 +58,7 @@ class SlurmLogin():
                 self.cmd_group = CmdSSH(self.ssh, cmd=cmd_for_group, output="list", spinner="Retrieving users's groups")
                 self.cmd_group.play()
                 # remove hpcuser from the list
-                self.cmd_group.result = [x for x in self.cmd_group.result if x not in self.removes] + ["tst"]
+                self.cmd_group.result = [x for x in self.cmd_group.result if x not in self.removes]
 
                 if len(self.cmd_group.result) > 0:
                     # we know the group so we can get the paths and user lists     
