@@ -38,9 +38,10 @@ class BrowseView():
                     self.files_list = [x.replace(self.folder, "") for x in self.cmd_dir.result]                    
                     self.sel_file = self.files_list[0]                                        
                     self.txt_contents = self.ssh.read_file(self.folder + self.sel_file)
+                    # get file stats
                     self.cmd_file = CmdSSH(self.ssh, cmd=f"stat {self.folder + self.sel_file}", output="none", spinner="stat")
                     self.cmd_file.play()
-                                                                                                                                                                                
+                                                                                                                                                                                                    
         if self.cmd_dir:
             if not self.cmd_dir.ok:
                 st.error(f"FAILED: {self.cmd_dir.error}")
@@ -49,9 +50,10 @@ class BrowseView():
                     self.sel_file = st.session_state.file
                     # retrieve user lists on this basis                    
                     self.txt_contents = self.ssh.read_file(self.folder + self.sel_file)
+                    # get file stats
                     self.cmd_file = CmdSSH(self.ssh, cmd=f"stat {self.folder + self.sel_file}", output="none", spinner="stat")
                     self.cmd_file.play()
-                                                                                
+                                                                                                    
                 # find index of selected group                
                 with cols[0]:
                     self.sel_file = st.radio("Select a file:", self.files_list, index=0, key="file",on_change=change_sel_file)
@@ -65,7 +67,7 @@ class BrowseView():
                                 st.text(self.txt_contents)
                             elif self.displays[t] == "code":
                                 st.code(self.txt_contents)
-                            elif self.displays[t] == "info":
+                            elif self.displays[t] == "info":                                
                                 st.code(self.cmd_file.result)
                             elif self.displays[t] in ["df","plot"]:
                                 try:

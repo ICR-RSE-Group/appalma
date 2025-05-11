@@ -46,33 +46,34 @@ class SlurmLogin():
                     self.server = st.text_input("Remote server:", self.server)
                 with cols2[1]:
                     self.sftp = st.text_input("SFTP server:", self.sftp)                
-        if st.button("Connect"):            
-            self.ssh = SshClient(server=self.server, username=self.username, password=self.password, port=self.port)                  
-            if self.ssh is not None:            
-                PageStore().set_global("ssh", self.ssh)
-            
-            # A set of commands to ascertain groups and usrs on slurm
-            cmd_for_group = f"sacctmgr list association user={self.username} format=Account -P | tail -n +2"
-            self.cmd_group = CmdSSH(self.ssh, cmd=cmd_for_group, output="list", spinner="Retrieving users's groups")
-            self.cmd_group.play()
-            # remove hpcuser from the list
-            self.cmd_group.result = [x for x in self.cmd_group.result if x not in self.removes] + ["tst"]
-
-            if len(self.cmd_group.result) > 0:
-                # we know the group so we can get the paths and user lists     
-                self.my_group = self.cmd_group.result[0]
-                self.my_home = f"/home/{self.username}"
-                if self.my_group in self.known_groups:
-                    self.my_scratch = f"{self.known_groups[self.my_group]}/{self.username}"
-                else:
-                    self.my_scratch = f"{self.scratch}/{self.my_group}"
+        with st.spinner("Logging in", show_time=True):
+            if st.button("Connect"):            
+                self.ssh = SshClient(server=self.server, username=self.username, password=self.password, port=self.port)                  
+                if self.ssh is not None:            
+                    PageStore().set_global("ssh", self.ssh)
                 
-                # retrieve user lists on this basis
-                cmd_for_users = f"sacctmgr list association account={self.my_group} format=User -P"
-                self.cmd_users = CmdSSH(self.ssh, cmd=cmd_for_users, output="list", spinner="Retrieving users's colleagues")
-                self.cmd_users.play()
-                if self.cmd_users.ok:
-                    self.my_users = self.cmd_users.result
+                # A set of commands to ascertain groups and usrs on slurm
+                cmd_for_group = f"sacctmgr list association user={self.username} format=Account -P | tail -n +2"
+                self.cmd_group = CmdSSH(self.ssh, cmd=cmd_for_group, output="list", spinner="Retrieving users's groups")
+                self.cmd_group.play()
+                # remove hpcuser from the list
+                self.cmd_group.result = [x for x in self.cmd_group.result if x not in self.removes] + ["tst"]
+
+                if len(self.cmd_group.result) > 0:
+                    # we know the group so we can get the paths and user lists     
+                    self.my_group = self.cmd_group.result[0]
+                    self.my_home = f"/home/{self.username}"
+                    if self.my_group in self.known_groups:
+                        self.my_scratch = f"{self.known_groups[self.my_group]}/{self.username}"
+                    else:
+                        self.my_scratch = f"{self.scratch}/{self.my_group}"
+                    
+                    # retrieve user lists on this basis
+                    cmd_for_users = f"sacctmgr list association account={self.my_group} format=User -P"
+                    self.cmd_users = CmdSSH(self.ssh, cmd=cmd_for_users, output="list", spinner="Retrieving users's colleagues")
+                    self.cmd_users.play()
+                    if self.cmd_users.ok:
+                        self.my_users = self.cmd_users.result
                     
                     
         if self.cmd_group:
@@ -104,7 +105,7 @@ class SlurmLogin():
                 PageStore().set_global("my_home", self.my_home)
                 PageStore().set_global("my_scratch", self.my_scratch)
                 PageStore().set_global("my_users", self.my_users)
-                
+
 
 
                 

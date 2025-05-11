@@ -45,9 +45,7 @@ class CmdSSH():
     def play(self):        
         if self.cmd_edit:
             self.cmd = st.text_area("Command:", self.cmd, height=100, key="cmd")
-        else:
-            st.write(self.cmd)
-        
+                
         if self.button == "":            
             self.play_inner()
         else:            
@@ -59,40 +57,44 @@ class CmdSSH():
         ouput = ["print", "df", "text", "code", "radio", "list"]
         """        
         with st.spinner(self.spinner, show_time=True):                                
-            print("Starting command", self.cmd)                        
-            start = time.time()
-            results = self.ssh.run_cmd(self.cmd)
-            results_str, error_str = results["output"], results["err"]                                               
-            end = time.time()            
-            print(f"Elapsed time {round(end - start, 3)} seconds")      
-            OK = error_str == None                
-            self.result = results_str
-            self.error = error_str
-            self.ok = OK
-            if not OK:                                                                                                                
-                st.error(f"FAILED: {error_str}")
-            else:                
-                if self.output == "print":
-                    print(results_str)                
-                elif self.output == "df":
-                    try:
-                        df = pd.read_csv(StringIO(results_str))
-                        st.dataframe(df)
-                    except Exception as e:
-                        st.error(f"Error parsing output: {e}")
-                elif self.output == "text":
-                    st.text(results_str)
-                elif self.output == "code":
-                    st.code(results_str)
-                elif self.output == "radio":
-                    lines = results_str.split("\n")
-                    if len(lines) > 0:
-                        self.selected_line = st.radio("Select a line:", lines)
-                        st.text(self.selected_line)
-                elif self.output == "list":
-                    lines = results_str.split("\n")
-                    if len(lines) > 0:
-                        self.result = lines
+            output = st.empty()
+            with st_capture(output.code):
+                print("Starting command", self.cmd)                        
+                start = time.time()
+                results = self.ssh.run_cmd(self.cmd)
+                results_str, error_str = results["output"], results["err"]                                               
+                end = time.time()            
+                print(f"Elapsed time {round(end - start, 3)} seconds")      
+                OK = error_str == None                
+                self.result = results_str
+                self.error = error_str
+                self.ok = OK
+                if not OK:                                                                                                                
+                    st.error(f"FAILED: {error_str}")
+                else:                
+                    if self.output == "print":
+                        print(results_str)                
+                    elif self.output == "df":
+                        try:
+                            df = pd.read_csv(StringIO(results_str))
+                            st.dataframe(df)
+                        except Exception as e:
+                            st.error(f"Error parsing output: {e}")
+                    elif self.output == "text":
+                        st.text(results_str)
+                    elif self.output == "code":
+                        st.code(results_str)
+                    elif self.output == "radio":
+                        lines = results_str.split("\n")
+                        if len(lines) > 0:
+                            self.selected_line = st.radio("Select a line:", lines)
+                            st.text(self.selected_line)
+                    elif self.output == "list":
+                        lines = results_str.split("\n")
+                        if len(lines) > 0:
+                            self.result = lines
+            with output:
+                st.write("")
                 
                                     
 ############################################################################        
