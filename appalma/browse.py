@@ -30,7 +30,7 @@ class BrowseView():
         self.folder = PageStore().get_global(self.folder_key)
         self.txt_dir = f"find {self.folder} -type f -maxdepth 1 -name '{self.filematch}'"        
         if self.edittable:
-            self.txt_dir = st.text_input("Search",self.txt_dir)
+            self.txt_dir = st.text_input("Search",self.txt_dir, key=f"{self.folder_key}_txtdir")
         cols = st.columns([2,5])                    
         with cols[0]:
             if st.button("List files", key=self.folder_key + "_lst_btn"):
@@ -65,7 +65,7 @@ class BrowseView():
                                                                                                     
                 # find index of selected group                
                 with cols[0]:
-                    self.sel_file = st.radio("Select a file:", self.files_list, index=0, key="file",on_change=change_sel_file)
+                    self.sel_file = st.radio("Select a file:", self.files_list, index=0, key=f"{self.folder_key}_radio",on_change=change_sel_file)
 
                 with cols[1]:
                     #st.write(f"Selected file = {self.sel_file}")
