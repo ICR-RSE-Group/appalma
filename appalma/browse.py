@@ -14,7 +14,7 @@ class FilesList():
 
     def __init__(self, ssh, filematch, folder, button=True):
         self.ssh = ssh      
-        self.filematch  
+        self.filematch = filematch
         self.folder = folder 
         self.txt_dir = f"find {self.folder} -type f -maxdepth 1 -name '{self.filematch}'"
         self.cmd_dir = None                        
