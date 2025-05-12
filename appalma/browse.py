@@ -36,10 +36,10 @@ class BrowseView():
             self.txt_dir = f"find {self.folder} -type f -maxdepth 1 -name '{self.filematch}'"        
             if self.edittable:
                 self.txt_dir = st.text_input("Search",self.txt_dir, key=f"{self.folder_key}_txtdir")
-            if len(self.displays) == 0:
-                cols = st.columns([1])  
-            else:
-                cols = st.columns([2,5])  
+            #if len(self.displays) == 0:
+            #    cols = st.columns([1])  
+            #else:
+            cols = st.columns([2,5])  
 
             with cols[0]:
                 if self.button:
@@ -52,10 +52,10 @@ class BrowseView():
         self.cmd_dir = CmdSSH(self.ssh, cmd=self.txt_dir, output="list", spinner="Retrieving files")
         self.cmd_dir.play()            
         # remove hpcuser from the list
-        if len(self.displays) == 0:
-                cols = st.columns([1])  
-        else:
-            cols = st.columns([2,5])  
+        #if len(self.displays) == 0:
+        #        cols = st.columns([1])  
+        #else:
+        cols = st.columns([2,5])  
         
         if len(self.cmd_dir.result) > 0:
             # retrieve user lists on this basis
