@@ -69,7 +69,7 @@ class BrowseView():
                 st.error(f"FAILED: {self.cmd_dir.error}")
             else:                                                
                 def change_sel_file():
-                    self.sel_file = st.session_state.file
+                    self.sel_file = st.session_state[f"{self.folder_key}_radio"]
                     # retrieve user lists on this basis                    
                     self.txt_contents = self.ssh.read_file(self.folder + self.sel_file)
                     # get file stats
