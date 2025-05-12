@@ -48,7 +48,7 @@ class BrowseView():
                 else:
                     self.play_inner(cols)
 
-    def play_inner(self):        
+    def play_inner(self, cols):        
         self.cmd_dir = CmdSSH(self.ssh, cmd=self.txt_dir, output="list", spinner="Retrieving files")
         self.cmd_dir.play()            
         # remove hpcuser from the list
