@@ -9,7 +9,7 @@ class SlurmLogin():
     Login for ssh based login
     """
 
-    def __init__(self, server="alma.icr.ac.uk", username=None, password=None, sftp="alma-app.icr.ac.uk", port=22, check_only=False):
+    def __init__(self, server="alma.icr.ac.uk", username=None, password=None, sftp="alma-app.icr.ac.uk", port=22):
         self.server = server
         self.username = username
         self.password = password
@@ -18,8 +18,7 @@ class SlurmLogin():
         self.ssh = None
         self.cmd_group = None
         self.cmd_users = None
-        self.check_only = check_only
-        
+
         self.removes = "hpcuser"
         self.scratch = "/data/scratch"
         self.known_groups = {"infotech": "/data/scratch/DCO/DIGOPS/SCIENCOM",
@@ -54,34 +53,29 @@ class SlurmLogin():
                 if self.ssh is not None:            
                     PageStore().set_global("ssh", self.ssh)
                 
-                if self.check_only:
-                    cmd_mini = f"ls -l"
-                    self.cmd_group = CmdSSH(self.ssh, cmd=cmd_mini, output="none", spinner="Checking access")
-                    self.cmd_group.play()
-                else:
-                    # A set of commands to ascertain groups and usrs on slurm
-                    cmd_for_group = f"sacctmgr list association user={self.username} format=Account -P | tail -n +2"
-                    self.cmd_group = CmdSSH(self.ssh, cmd=cmd_for_group, output="list", spinner="Retrieving users's groups")
-                    self.cmd_group.play()
-                    # remove hpcuser from the list
-                    self.cmd_group.result = [x for x in self.cmd_group.result if x not in self.removes]
+                # A set of commands to ascertain groups and usrs on slurm
+                cmd_for_group = f"sacctmgr list association user={self.username} format=Account -P | tail -n +2"
+                self.cmd_group = CmdSSH(self.ssh, cmd=cmd_for_group, output="list", spinner="Retrieving users's groups")
+                self.cmd_group.play()
+                # remove hpcuser from the list
+                self.cmd_group.result = [x for x in self.cmd_group.result if x not in self.removes]
 
-                    if len(self.cmd_group.result) > 0:
-                        # we know the group so we can get the paths and user lists     
-                        self.my_group = self.cmd_group.result[0]
-                        self.my_home = f"/home/{self.username}"
-                        if self.my_group in self.known_groups:
-                            self.my_scratch = f"{self.known_groups[self.my_group]}/{self.username}"
-                        else:
-                            self.my_scratch = f"{self.scratch}/{self.my_group}"
-                        
-                        # retrieve user lists on this basis
-                        cmd_for_users = f"sacctmgr list association account={self.my_group} format=User -P"
-                        self.cmd_users = CmdSSH(self.ssh, cmd=cmd_for_users, output="list", spinner="Retrieving users's colleagues")
-                        self.cmd_users.play()
-                        if self.cmd_users.ok:
-                            self.my_users = self.cmd_users.result
-                        
+                if len(self.cmd_group.result) > 0:
+                    # we know the group so we can get the paths and user lists     
+                    self.my_group = self.cmd_group.result[0]
+                    self.my_home = f"/home/{self.username}"
+                    if self.my_group in self.known_groups:
+                        self.my_scratch = f"{self.known_groups[self.my_group]}/{self.username}"
+                    else:
+                        self.my_scratch = f"{self.scratch}/{self.my_group}"
+                    
+                    # retrieve user lists on this basis
+                    cmd_for_users = f"sacctmgr list association account={self.my_group} format=User -P"
+                    self.cmd_users = CmdSSH(self.ssh, cmd=cmd_for_users, output="list", spinner="Retrieving users's colleagues")
+                    self.cmd_users.play()
+                    if self.cmd_users.ok:
+                        self.my_users = self.cmd_users.result
+                    
                     
         if self.cmd_group:
             if not self.cmd_group.ok:
@@ -89,30 +83,29 @@ class SlurmLogin():
             else:
                 st.success("Connected to server")
                                 
-                if not self.check_only:
-                    def change_sel_group():
-                        self.my_group = st.session_state.group                
-                        # retrieve user lists on this basis
-                        cmd_for_users = f"sacctmgr list association account={self.my_group} format=User -P"
-                        self.cmd_users = CmdSSH(self.ssh, cmd=cmd_for_users, output="list", spinner="Retrieving users's colleagues")
-                        self.cmd_users.play()
-                        if self.cmd_users.ok:
-                            self.my_users = self.cmd_users.result
+                def change_sel_group():
+                    self.my_group = st.session_state.group                
+                    # retrieve user lists on this basis
+                    cmd_for_users = f"sacctmgr list association account={self.my_group} format=User -P"
+                    self.cmd_users = CmdSSH(self.ssh, cmd=cmd_for_users, output="list", spinner="Retrieving users's colleagues")
+                    self.cmd_users.play()
+                    if self.cmd_users.ok:
+                        self.my_users = self.cmd_users.result
 
-                    # find index of selected group                
-                    self.my_group = st.radio("Select a group:", self.cmd_group.result, index=0, key="group",on_change=change_sel_group)
+                # find index of selected group                
+                self.my_group = st.radio("Select a group:", self.cmd_group.result, index=0, key="group",on_change=change_sel_group)
 
 
-                                                                        
-                    st.write(f"Selected group = {self.my_group}")
-                    st.write(f"Home path = {self.my_home}")
-                    st.write(f"Scratch path = {self.my_scratch}")
-                    st.write(f"Colleagues = {self.my_users}")
+                                                                    
+                st.write(f"Selected group = {self.my_group}")
+                st.write(f"Home path = {self.my_home}")
+                st.write(f"Scratch path = {self.my_scratch}")
+                st.write(f"Colleagues = {self.my_users}")
 
-                    PageStore().set_global("my_group", self.my_group)
-                    PageStore().set_global("my_home", self.my_home)
-                    PageStore().set_global("my_scratch", self.my_scratch)
-                    PageStore().set_global("my_users", self.my_users)
+                PageStore().set_global("my_group", self.my_group)
+                PageStore().set_global("my_home", self.my_home)
+                PageStore().set_global("my_scratch", self.my_scratch)
+                PageStore().set_global("my_users", self.my_users)
 
 
 
