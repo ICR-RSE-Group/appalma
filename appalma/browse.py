@@ -12,7 +12,8 @@ class BrowseView():
     Login for ssh based login
     """
 
-    def __init__(self, ssh, filematch, folder_key, displays=["text"], edittable=False, include_stat = True):
+    def __init__(self, ssh, filematch, folder_key, displays=["text"], 
+                 edittable=False, include_stat = True, button=True):
         self.ssh = ssh
         self.filematch = filematch
         self.folder_key = folder_key
@@ -25,6 +26,7 @@ class BrowseView():
         self.txt_contents = ""        
         self.displays = displays # this can be a list of displays which are shown on tabs text, code, info, df, plot (plot not implemented yet!)
         self.files_list = []
+        self.button = button
                                             
     def play(self):        
         self.folder = PageStore().get_global(self.folder_key)
@@ -40,23 +42,29 @@ class BrowseView():
                 cols = st.columns([2,5])  
 
             with cols[0]:
-                if st.button("List files", key=self.folder_key + "_lst_btn"):
-                    self.cmd_dir = CmdSSH(self.ssh, cmd=self.txt_dir, output="list", spinner="Retrieving files")
-                    self.cmd_dir.play()            
-                    # remove hpcuser from the list
-                    
-                    if len(self.cmd_dir.result) > 0:
-                        # retrieve user lists on this basis
-                        # remove the path from the result                        
-                        # replace all the paths in the path with ""
-                        self.files_list = [x.replace(self.folder, "") for x in self.cmd_dir.result]                    
-                        self.sel_file = self.files_list[0]                                        
-                        self.txt_contents = self.ssh.read_file(self.folder + self.sel_file)
-                        # get file stats
-                        if self.include_stat:
-                            self.cmd_file = CmdSSH(self.ssh, cmd=f"stat {self.folder + self.sel_file}", output="none", spinner="stat")
-                            self.cmd_file.play()
-                                                                                                                                                                                                        
+                if self.button:
+                    if st.button("List files", key=self.folder_key + "_lst_btn"):
+                        self.play_inner(cols)
+                else:
+                    self.play_inner(cols)
+
+        def play_inner(self):        
+            self.cmd_dir = CmdSSH(self.ssh, cmd=self.txt_dir, output="list", spinner="Retrieving files")
+            self.cmd_dir.play()            
+            # remove hpcuser from the list
+            
+            if len(self.cmd_dir.result) > 0:
+                # retrieve user lists on this basis
+                # remove the path from the result                        
+                # replace all the paths in the path with ""
+                self.files_list = [x.replace(self.folder, "") for x in self.cmd_dir.result]                    
+                self.sel_file = self.files_list[0]                                        
+                self.txt_contents = self.ssh.read_file(self.folder + self.sel_file)
+                # get file stats
+                if self.include_stat:
+                    self.cmd_file = CmdSSH(self.ssh, cmd=f"stat {self.folder + self.sel_file}", output="none", spinner="stat")
+                    self.cmd_file.play()
+                                                                                                                                                                                                    
             if self.cmd_dir:
                 if not self.cmd_dir.ok:
                     st.error(f"FAILED: {self.cmd_dir.error}")
@@ -112,7 +120,7 @@ class BrowseView():
                                         st.error(f"Unknown display type: {self.displays[t]}")
                             
                         
-                        
+                            
 
 
                     
