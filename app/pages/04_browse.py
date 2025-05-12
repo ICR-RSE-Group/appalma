@@ -8,7 +8,7 @@ PageStore().add_to_page("cfg", PageConfig())
 
 ssh = PageStore().ssh_success()
 if ssh:
-    PageStore().add_to_page("bv", BrowseView(ssh,filematch = "*.out", 
+    PageStore().add_to_page("bv", BrowseView(ssh,filematch = "*.*", 
                                              folder_key="inputs_working", 
                                              displays=["code","text","info","df", "plot"],
                                              edittable=True))

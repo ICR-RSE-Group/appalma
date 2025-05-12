@@ -22,5 +22,11 @@ source .env-appalma/bin/activate
 python -m pip install --upgrade pip build
 python -m build
 python -m pip install -e .
+python -m pip install -r requirements.txt
+```
+
+4. Run the demo harness app
+```bash
+streamlit run app/Home.py
 ```
 
