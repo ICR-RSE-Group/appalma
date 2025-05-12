@@ -56,7 +56,7 @@ class SlurmLogin():
                 
                 if self.check_only:
                     cmd_mini = f"ls -l"
-                    self.cmd_group = CmdSSH(self.ssh, cmd=cmd_mini, output="text", spinner="Checking access")
+                    self.cmd_group = CmdSSH(self.ssh, cmd=cmd_mini, output="none", spinner="Checking access")
                     self.cmd_group.play()
                 else:
                     # A set of commands to ascertain groups and usrs on slurm
