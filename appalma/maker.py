@@ -11,17 +11,20 @@ class PageStore(object):
         ssh = self.get_global("ssh")
         return ssh
 
-    def add_to_page(self, key, page=None):        
+    def add_to_page(self, key, page=None, force_new=False):        
         if not hasattr(self, 'pages'):
             self.pages = {}
         #if key in self.pages and page is not None:
         #    self.pages[key] = page
         #    self.pages[key].play()
-        if key in self.pages and self.pages[key] is not None:            
-            self.pages[key].play()
-        else:             
+        
+        if force_new:
             self.pages[key] = page
-            page.play()
+        elif key not in self.pages:
+            self.pages[key] = page
+        elif key in self.pages and self.pages[key] is None:
+            self.pages[key] = page
+        self.pages[key].play()
 
     def set_global(self, key, value):
         if not hasattr(self, 'globals'):
