@@ -7,6 +7,29 @@ from .maker import PageStore
 
 
 
+class FilesList():
+    """
+    Browse files in a directory
+    """
+
+    def __init__(self, ssh, filematch, folder, button=True):
+        self.ssh = ssh      
+        self.filematch  
+        self.folder = folder 
+        self.txt_dir = f"find {self.folder} -type f -maxdepth 1 -name '{self.filematch}'"
+        self.cmd_dir = None                        
+        self.txt_contents = ""        
+        self.files_list = []
+        self.button = button
+
+    def play(self):        
+        self.cmd_dir = CmdSSH(self.ssh, cmd=self.txt_dir, output="list", spinner="")
+        self.cmd_dir.play()                                                            
+        # replace all the paths in the path with ""
+        self.files_list = [x.replace(self.folder, "") for x in self.cmd_dir.result]                                    
+        
+                                                                                                                                                                                                                                            
+#################################################################################
 class BrowseView():
     """
     Login for ssh based login
