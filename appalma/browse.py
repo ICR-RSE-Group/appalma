@@ -12,7 +12,7 @@ class BrowseView():
     Login for ssh based login
     """
 
-    def __init__(self, ssh, filematch, folder_key, displays=["text"], edittable=False):        
+    def __init__(self, ssh, filematch, folder_key, displays=["text"], edittable=False, include_stat = True):
         self.ssh = ssh
         self.filematch = filematch
         self.folder_key = folder_key
@@ -21,6 +21,7 @@ class BrowseView():
         self.cmd_dir = None
         self.cmd_file = None
         self.edittable = edittable
+        self.include_stat = include_stat
         self.txt_contents = ""        
         self.displays = displays # this can be a list of displays which are shown on tabs text, code, info, df, plot (plot not implemented yet!)
         self.files_list = []
@@ -45,8 +46,9 @@ class BrowseView():
                     self.sel_file = self.files_list[0]                                        
                     self.txt_contents = self.ssh.read_file(self.folder + self.sel_file)
                     # get file stats
-                    self.cmd_file = CmdSSH(self.ssh, cmd=f"stat {self.folder + self.sel_file}", output="none", spinner="stat")
-                    self.cmd_file.play()
+                    if self.include_stat:
+                        self.cmd_file = CmdSSH(self.ssh, cmd=f"stat {self.folder + self.sel_file}", output="none", spinner="stat")
+                        self.cmd_file.play()
                                                                                                                                                                                                     
         if self.cmd_dir:
             if not self.cmd_dir.ok:
@@ -57,8 +59,9 @@ class BrowseView():
                     # retrieve user lists on this basis                    
                     self.txt_contents = self.ssh.read_file(self.folder + self.sel_file)
                     # get file stats
-                    self.cmd_file = CmdSSH(self.ssh, cmd=f"stat {self.folder + self.sel_file}", output="none", spinner="stat")
-                    self.cmd_file.play()
+                    if self.include_stat:
+                        self.cmd_file = CmdSSH(self.ssh, cmd=f"stat {self.folder + self.sel_file}", output="none", spinner="stat")
+                        self.cmd_file.play()
                                                                                                     
                 # find index of selected group                
                 with cols[0]:
@@ -73,8 +76,11 @@ class BrowseView():
                                 st.text(self.txt_contents)
                             elif self.displays[t] == "code":
                                 st.code(self.txt_contents)
-                            elif self.displays[t] == "info":                                
-                                st.code(self.cmd_file.result)
+                            elif self.displays[t] == "info":     
+                                if self.include_stat:
+                                    st.code(self.cmd_file.result)
+                                else:
+                                    st.warning("No file stats available, please include them in the command")
                             elif self.displays[t] in ["df","plot"]:
                                 try:
                                     df = pd.read_csv(StringIO(self.txt_contents))                                    
