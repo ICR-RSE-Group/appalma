@@ -36,17 +36,12 @@ class BrowseView():
             self.txt_dir = f"find {self.folder} -type f -maxdepth 1 -name '{self.filematch}'"        
             if self.edittable:
                 self.txt_dir = st.text_input("Search",self.txt_dir, key=f"{self.folder_key}_txtdir")
-            #if len(self.displays) == 0:
-            #    cols = st.columns([1])  
-            #else:
-            cols = st.columns([2,5])  
-
-            with cols[0]:
-                if self.button:
-                    if st.button("List files", key=self.folder_key + "_lst_btn"):
-                        self.play_inner()
-                else:
+                                    
+            if self.button:
+                if st.button("List files", key=self.folder_key + "_lst_btn"):
                     self.play_inner()
+            else:
+                self.play_inner()
 
     def play_inner(self):        
         self.cmd_dir = CmdSSH(self.ssh, cmd=self.txt_dir, output="list", spinner="Retrieving files")
