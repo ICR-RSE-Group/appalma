@@ -38,6 +38,12 @@ class PageStore(object):
             return self.globals[key]
         else:
             return None
+        
+    def clean(self):
+        if hasattr(self, 'globals'):
+            self.globals = {}
+        if hasattr(self, 'pages'):
+            self.pages = {}
 
 
 

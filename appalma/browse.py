@@ -5,8 +5,37 @@ from .cmd import CmdSSH
 from .maker import PageStore
 
 
+class FilesList():
+    """
+    List files in a folder
+    """
 
+    def __init__(self, ssh, filematch, folders, button=""):
+        self.ssh = ssh
+        self.filematch = filematch
+        self.folders = folders
+        self.button = button
+        self.init = False
+        self.folders_files = {}
+        
 
+    def play(self):
+        
+        if self.button:
+            if st.button(self.button, key=self.button):
+                self.play_inner()
+        elif not self.init:                                
+            self.play_inner()
+                                    
+    def play_inner(self): 
+        self.init = True
+        for fldr in self.folders:
+            cmd_txt = f"find {fldr} -type f -maxdepth 1 -name '{self.filematch}'"            
+            cmd_file = CmdSSH(ssh=self.ssh, cmd=cmd_txt, output="list")
+            cmd_file.play()            
+            self.folders_files[fldr] = cmd_file.result
+                                                                            
+#####################################################################################
 class BrowseView():
     """
     Login for ssh based login

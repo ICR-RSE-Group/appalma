@@ -13,4 +13,7 @@ st.write(
     """
 )
 
+if st.button("Clean the cache"):
+    PageStore().clean()
+
 
