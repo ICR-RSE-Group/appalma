@@ -10,13 +10,14 @@ class FilesList():
     List files in a folder
     """
 
-    def __init__(self, ssh, filematch, folders, button=""):
+    def __init__(self, ssh, filematch, folders, button="", show_search=False):
         self.ssh = ssh
         self.filematch = filematch
         self.folders = folders
         self.button = button
         self.init = False
         self.folders_files = {}
+        self.show_search = show_search
         
 
     def play(self):
@@ -30,7 +31,9 @@ class FilesList():
     def play_inner(self): 
         self.init = True
         for fldr in self.folders:
-            cmd_txt = f"find {fldr} -type f -maxdepth 1 -name '{self.filematch}'"            
+            cmd_txt = f"find {fldr} -type f -maxdepth 1 -name '{self.filematch}'"
+            if self.show_search:
+                st.write(cmd_txt)
             cmd_file = CmdSSH(ssh=self.ssh, cmd=cmd_txt, output="list")
             cmd_file.play()            
             self.folders_files[fldr] = cmd_file.result
