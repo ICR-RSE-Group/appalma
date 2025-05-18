@@ -103,29 +103,35 @@ class CmdLocal():
     Login for local system.os
     """
 
-    def __init__(self, cmd=["ls", "-a"]):
+    def __init__(self, cmd=["ls", "-a"], cmd2=[], button="Execute"):
         self.cmd = cmd
+        self.button = button
+        self.cmd2 = cmd2
         self.key="_".join(self.cmd).replace("/","_").replace(" ","_").replace("-","_")       
                                         
-    def play(self):
-        cols = st.columns([2,2,7])
-        with cols[2]:
-            with st.expander("Command output", expanded=False):                        
-                output = st.empty()
-        with cols[0]:        
-            if st.button("Execute", key=self.key):
-                with st.spinner("", show_time=True):                    
-                    with st_capture(output.code):                                    
-                        print("Starting command", self.cmd)                        
-                        start = time.time()
-                        ret = self.cmd_runner_with_wait(self.cmd)
-                        end = time.time()            
-                        print(f"Elapsed time {round(end - start, 3)} seconds")                          
-                        with cols[1]:
-                            if ret == "done":
-                                st.success("OK")
-                            else:
-                                st.error("FAILED")
+    def play(self):        
+        
+        with st.expander("Command output", expanded=False):                        
+            output = st.empty()        
+        if st.button(self.button, key=self.key):
+            with st.spinner("", show_time=True):                    
+                with st_capture(output.code):                                    
+                    print("Starting command", self.cmd)                        
+                    start = time.time()
+                    ret = self.cmd_runner_with_wait(self.cmd)
+                    end = time.time()            
+                    print(f"Elapsed time {round(end - start, 3)} seconds")                                              
+                    if len(self.cmd2) > 0:
+                        print("Starting command", self.cmd2)                        
+                        start2 = time.time()
+                        ret = self.cmd_runner_with_wait(self.cmd2)
+                        end2 = time.time()            
+                        print(f"Elapsed time 2 {round(end2 - start2, 3)} seconds")
+                        print(f"Total time {round(end2 - start, 3)} seconds")
+        if ret == "done":
+            st.success("OK")
+        else:
+            st.error("FAILED")
 
     
     def cmd_runner_with_wait(self,params):
