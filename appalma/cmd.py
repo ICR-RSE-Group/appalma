@@ -109,11 +109,11 @@ class CmdLocal():
         self.cmd2 = cmd2
         self.key="_".join(self.cmd).replace("/","_").replace(" ","_").replace("-","_")       
                                         
-    def play(self):        
-        
-        with st.expander("Command output", expanded=False):                        
-            output = st.empty()        
+    def play(self):                        
         if st.button(self.button, key=self.key):
+            with st.expander("Command output", expanded=False):                        
+                output = st.empty()        
+            ret = ""
             with st.spinner("", show_time=True):                    
                 with st_capture(output.code):                                    
                     print("Starting command", self.cmd)                        
@@ -128,10 +128,10 @@ class CmdLocal():
                         end2 = time.time()            
                         print(f"Elapsed time 2 {round(end2 - start2, 3)} seconds")
                         print(f"Total time {round(end2 - start, 3)} seconds")
-        if ret == "done":
-            st.success("OK")
-        else:
-            st.error("FAILED")
+            if ret == "done":
+                st.success("OK")
+            else:
+                st.error("FAILED")
 
     
     def cmd_runner_with_wait(self,params):
