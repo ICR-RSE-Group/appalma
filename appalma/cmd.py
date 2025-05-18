@@ -105,6 +105,7 @@ class CmdLocal():
 
     def __init__(self, cmd=["ls", "-a"]):
         self.cmd = cmd
+        self.key="_".join(self.cmd).replace("/","_").replace(" ","_").replace("-","_")       
                                         
     def play(self):
         cols = st.columns([2,2,7])
@@ -112,7 +113,7 @@ class CmdLocal():
             with st.expander("Command output", expanded=False):                        
                 output = st.empty()
         with cols[0]:        
-            if st.button("Execute"):
+            if st.button("Execute", key=self.key):
                 with st.spinner("", show_time=True):                    
                     with st_capture(output.code):                                    
                         print("Starting command", self.cmd)                        
