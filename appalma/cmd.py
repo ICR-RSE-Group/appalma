@@ -103,10 +103,11 @@ class CmdLocal():
     Login for local system.os
     """
 
-    def __init__(self, cmd=["ls", "-a"], cmd2=[], button="Execute"):
+    def __init__(self, cmd=["ls", "-a"], cmd2=[], button="Execute", env=[]):
         self.cmd = cmd
         self.button = button
         self.cmd2 = cmd2
+        self.env = env
         self.key="_".join(self.cmd).replace("/","_").replace(" ","_").replace("-","_")       
                                         
     def play(self):                        
@@ -136,7 +137,10 @@ class CmdLocal():
     
     def cmd_runner_with_wait(self,params):
         print("---  ")
-        result = subprocess.Popen(params,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=False)
+        if self.env == []:
+            result = subprocess.Popen(params,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=False)
+        else:
+            result = subprocess.Popen(params,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=False,env=self.env)
         error_msg = False
         any_exceptions = False        
         # Wait until process terminates
