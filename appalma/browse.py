@@ -32,7 +32,7 @@ class FilesList():
     def play_inner(self): 
         self.init = True
         for fldr in self.folders:
-            cmd_txt = f"find {fldr} -type f -maxdepth {self.depth} -name '{self.filematch}'"
+            cmd_txt = f"find {fldr} -maxdepth {self.depth} -type f -name '{self.filematch}'"
             if self.show_search:
                 st.write(cmd_txt)
             cmd_file = CmdSSH(ssh=self.ssh, cmd=cmd_txt, output="list")
