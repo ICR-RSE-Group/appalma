@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from io import StringIO
-from .cmd import CmdSSH
+from .cmd import CmdLocal, CmdSSH
 from .maker import PageStore
 
 
@@ -35,8 +35,12 @@ class FilesList():
             cmd_txt = f"find {fldr} -maxdepth {self.depth} -type f -name '{self.filematch}'"
             if self.show_search:
                 st.write(cmd_txt)
-            cmd_file = CmdSSH(ssh=self.ssh, cmd=cmd_txt, output="list")
-            cmd_file.play()            
+            if self.ssh is None:
+                cmd_file = CmdLocal(cmd=cmd_txt, button="Retrieving files")
+                cmd_file.play()            
+            else:
+                cmd_file = CmdSSH(ssh=self.ssh, cmd=cmd_txt, output="list")
+                cmd_file.play()            
             self.folders_files[fldr] = cmd_file.result
                                                                             
 #####################################################################################

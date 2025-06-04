@@ -27,6 +27,6 @@ python -m pip install -r requirements.txt
 
 4. Run the demo harness app
 ```bash
-streamlit run app/Home.py
+streamlit run app/home.py
 ```
 

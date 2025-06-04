@@ -103,12 +103,14 @@ class CmdLocal():
     Login for local system.os
     """
 
-    def __init__(self, cmd=["ls", "-a"], cmd2=[], button="Execute", env=[]):
+    def __init__(self, cmd=["ls", "-a"], cmd2=[], output="print", button="Execute", env=[]):
         self.cmd = cmd
         self.button = button
         self.cmd2 = cmd2
         self.env = env
-        self.key="_".join(self.cmd).replace("/","_").replace(" ","_").replace("-","_")       
+        self.output = output
+        self.key="_".join(self.cmd).replace("/","_").replace(" ","_").replace("-","_")
+        self.result = ""
                                         
     def play(self):                        
         if st.button(self.button, key=self.key):
@@ -167,11 +169,32 @@ class CmdLocal():
                     any_exceptions = True
                 error  = result.stderr.readline()
             time.sleep(0.001)
-            output  = result.stdout.readline()
+            results_str  = result.stdout.readline()
             if output:
                 print(output.strip().decode('utf-8'))
             result.poll()
-            print("---------  ")
+            print("---------  ")            
+            if self.output == "print":
+                print(results_str)                
+            elif self.output == "df":
+                try:
+                    df = pd.read_csv(StringIO(results_str))
+                    st.dataframe(df)
+                except Exception as e:
+                    st.error(f"Error parsing output: {e}")
+            elif self.output == "text":
+                st.text(results_str)
+            elif self.output == "code":
+                st.code(results_str)
+            elif self.output == "radio":
+                lines = results_str.split("\n")
+                if len(lines) > 0:
+                    self.selected_line = st.radio("Select a line:", lines)
+                    st.text(self.selected_line)
+            elif self.output == "list":
+                lines = results_str.split("\n")
+                if len(lines) > 0:
+                    self.result = lines
             if any_exceptions:
                 print("!!! failed")
                 return "failed"
